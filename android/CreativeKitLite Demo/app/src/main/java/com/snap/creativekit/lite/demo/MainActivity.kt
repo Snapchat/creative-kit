@@ -1,7 +1,5 @@
 package com.snap.creativekit.lite.demo
 
-import android.annotation.TargetApi
-import android.app.PendingIntent
 import android.content.ContentResolver
 import android.content.Intent
 import android.graphics.Bitmap
@@ -13,7 +11,6 @@ import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
-import com.example.cklitesample.CKLite
 import org.json.JSONException
 import org.json.JSONObject
 import java.io.*
