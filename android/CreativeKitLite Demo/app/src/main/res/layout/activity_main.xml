@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <Button
+        android:id="@+id/preview_image_demo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Share CKLite Preview Image"
+        app:layout_constraintBottom_toTopOf="@id/preview_video_demo"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/preview_video_demo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Share CKLite Preview Video"
+        app:layout_constraintBottom_toTopOf="@id/camera_demo"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/preview_image_demo" />
+
+    <Button
+        android:id="@+id/camera_demo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Launch CKLite Camera"
+        app:layout_constraintBottom_toTopOf="@id/camera_lens_demo"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/preview_video_demo" />
+
+    <Button
+        android:id="@+id/camera_lens_demo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Launch CKLite Camera With lens"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/camera_demo" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
