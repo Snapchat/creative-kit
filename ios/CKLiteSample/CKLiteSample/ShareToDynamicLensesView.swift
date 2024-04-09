@@ -8,36 +8,36 @@
 import SwiftUI
 
 struct ShareToDynamicLensesView: View {
-    @State private var lensId: String = "4fb863f7b6024383aff06c814219ac06"
-    @State private var clientId: String = "3d68a397-4f69-4f01-94e0-72a9975d8f58"
-    @State private var url: String = "something_simple"
+    @State private var key1: String = "value for key1"
+    @State private var key2: String = "value for key2"
 
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
             Spacer()
             Text("Provide values to the keys below:")
-            HStack{
-                Text("Lens ID: ").bold()
-                TextField("Lens ID", text: $lensId)
-            }
-            HStack{
-                Text("Client ID: ").bold()
-                TextField("Client ID", text: $clientId)
-            }
-            HStack{
-                Text("URL: ").bold()
-                TextField("URL", text: $url)
+            VStack{
+                HStack{
+                    Text("Key 1: ").bold()
+                    TextField("Value 1", text: $key1)
+                }
+                HStack{
+                    Text("Key 2: ").bold()
+                    TextField("Value 2", text: $key2)
+                }
             }
             Spacer()
             HStack() {
                 Spacer()
                 Button(action:{
                     shareDynamicLenses(
-                        lensUUID: $lensId.wrappedValue,
-                        clientID: $clientId.wrappedValue,
+                        clientID: Identifiers.CLIENT_ID,
+                        lensUUID: Identifiers.LENS_UUID,
                         launchData: [
-                            "share_url":$url.wrappedValue
-                        ]
+                            "key1":$key1.wrappedValue,
+                            "key2":$key2.wrappedValue
+                        ],
+                        caption: nil,
+                        sticker: nil
                     )
                 }) {
                     Text("Share to dynamic lens")

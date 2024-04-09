@@ -53,13 +53,11 @@ struct ShareToCameraView: View {
                     Spacer()
                     Button(action:{
                         let resized = resizeImage(image: selectedImage!, newWidth: 200)
-                        shareOnSnapchat(
+                        let sticker = StickerData(posX: 0.5, posY:0.5, image: resized!.pngData()!)
+                        shareToCamera(
                             clientID: Identifiers.CLIENT_ID,
-                            shareMedia: ShareMedia.image,
-                            shareDest: ShareDestination.camera,
-                            mediaData: resized!.pngData()!,
                             caption: $caption.wrappedValue,
-                            attachmentURL: $attachmentUrl.wrappedValue
+                            sticker: sticker
                         )
                     })
                     {

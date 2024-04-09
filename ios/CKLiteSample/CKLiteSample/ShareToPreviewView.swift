@@ -52,13 +52,12 @@ struct ShareToPreviewView: View {
                 {
                     Spacer()
                     Button(action:{
-                        shareOnSnapchat(
+                        shareToPreview(
                             clientID: Identifiers.CLIENT_ID,
-                            shareMedia: ShareMedia.image,
-                            shareDest: ShareDestination.preview,
+                            mediaType: ShareMediaType.image,
                             mediaData: self.selectedImage!.pngData()!,
                             caption: $caption.wrappedValue,
-                            attachmentURL: $attachmentUrl.wrappedValue
+                            sticker: nil
                         )
                     })
                     {

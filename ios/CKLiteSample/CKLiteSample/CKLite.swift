@@ -19,7 +19,7 @@ enum ShareDestination: String {
     case camera = "snapchat://creativekit/camera/1"
 }
 
-enum ShareMedia {
+enum ShareMediaType {
     case image
     case video
 }
@@ -28,7 +28,18 @@ enum CreativeKitStickerMetadataKeys {
     static let posX = "posX"
     static let posY = "posY"
     static let rotation = "rotation"
+    static let widthDp = "widthDp"
+    static let heightDp = "heightDp"
     static let stickerMetadata = "stickerMetadata"
+}
+
+struct StickerData {
+    var posX:Float = 0.5
+    var posY:Float = 0.5
+    var rotation:Float = 0
+    var widthDp:Int = 200
+    var heightDp:Int = 200
+    var image:Data
 }
 
 func createImageData(_ image: UIImage) -> Data? {
@@ -48,54 +59,156 @@ func createVideoData(_ videoURL: URL) -> Data? {
     return videoData
 }
 
-func shareDynamicLenses(lensUUID: String, clientID:String, launchData:NSDictionary) {
-       // Verify if Snapchat can be opened
-       guard var urlComponents = URLComponents(string: ShareDestination.camera.rawValue),
-           let url = urlComponents.url,
-           UIApplication.shared.canOpenURL(url)
-       else {
-           return
-       }
-           
+func addSticker(dict: [String:Any], sticker:StickerData) -> [String:Any]
+{
+    var newDict = dict;
+    
+    newDict[CreativeKitLiteKeys.stickerImage] = sticker.image
+    
+    var stickerMetadata = [String:Any]()
+    stickerMetadata[CreativeKitStickerMetadataKeys.posX] = sticker.posX
+    stickerMetadata[CreativeKitStickerMetadataKeys.posY] = sticker.posY
+    stickerMetadata[CreativeKitStickerMetadataKeys.rotation] = sticker.rotation
+    stickerMetadata[CreativeKitStickerMetadataKeys.widthDp] = sticker.widthDp
+    stickerMetadata[CreativeKitStickerMetadataKeys.heightDp] = sticker.heightDp
+    
+    var payloadMetadata = [String:Any]()
+    payloadMetadata[CreativeKitStickerMetadataKeys.stickerMetadata] = stickerMetadata
+    newDict[CreativeKitLiteKeys.payloadMetadata] = payloadMetadata
+    
+    return newDict
+}
 
-       // Pass the content to the pasteboard
-       var dict: [String: Any] = [
-           CreativeKitLiteKeys.clientID: clientID,
-           CreativeKitLiteKeys.lensUUID: lensUUID,
-       ]
+func shareDynamicLenses(clientID:String, lensUUID: String, launchData:NSDictionary, caption:String?, sticker:StickerData?) {
+    // Pass the content to the pasteboard
+    var dict: [String: Any] = [
+       CreativeKitLiteKeys.clientID: clientID,
+       CreativeKitLiteKeys.lensUUID: lensUUID,
+    ]
 
-       // Add Launch Data (optional)
-       // If you need to pass in any numeric value as part of the launch data,
-       // make sure to pass it as a string if precision is important
-       do {
-           let launchDataData = try JSONSerialization.data(withJSONObject: launchData)
-           let launchDataString = NSString.init(data: launchDataData, encoding: NSUTF8StringEncoding)! as String
-           dict[CreativeKitLiteKeys.launchData] = launchDataString
-       } catch {
-           print("JSON serialization failed: ", error)
-       }
-//       dict[CreativeKitLiteKeys.appName] = "CK Lite Demo"
-       dict[CreativeKitLiteKeys.caption] = "This is a test of CK Lite with Dynamic Lenses"
-       let items = [dict]
+    // Add Launch Data (optional) - these are values that can be captured by your Lens project
+    // More info about Launch Params here: https://docs.snap.com/lens-studio/references/guides/distributing/snap-kit#dynamic-lens-template
+    // If you need to pass in any numeric value as part of the launch data,
+    // make sure to pass it as a string if precision is important
+    do {
+       let launchDataData = try JSONSerialization.data(withJSONObject: launchData)
+       let launchDataString = NSString.init(data: launchDataData, encoding: NSUTF8StringEncoding)! as String
+       dict[CreativeKitLiteKeys.launchData] = launchDataString
+    } catch {
+       print("JSON serialization failed: ", error)
+    }
+    
+    // Optionally Add caption
+    if let caption = caption
+    {
+        dict[CreativeKitLiteKeys.caption] = caption
+    }
 
-       // Set expiration date for Pasteboard to 5 minutes
-       let expire = Date().addingTimeInterval(5 * 60)
-       let options = [UIPasteboard.OptionsKey.expirationDate: expire]
-       UIPasteboard.general.setItems(items, options: options)
+    // Optionally Add sticker
+    if let sticker = sticker
+    {
+       dict = addSticker(dict: dict, sticker: sticker)
+    }
 
-       // Ensure that the pasteboard isn't tampered, we pass the checkcount to ensure
-       // the integrity of the pasteboard content
-       let queryItem = URLQueryItem.init(
-           name: "checkcount",
-           value: String(format: "%ld", UIPasteboard.general.changeCount))
-       urlComponents.queryItems = [queryItem]
-       if let finalURL = urlComponents.url {
-           UIApplication.shared.open(finalURL, options: [:], completionHandler: nil)
-       }
+    createAndOpenShareUrl(clientID:clientID, shareDest: ShareDestination.camera, dict:dict)
+}
+
+// Shares media to a full screen snap that can be posted to stories or shared directly with a friend
+func shareToPreview(clientID: String, mediaType: ShareMediaType, mediaData: Data, caption: String?, sticker: StickerData?)
+{
+    // Pass media content to the pasteboard
+    var dict: [String: Any] = [ CreativeKitLiteKeys.clientID: clientID ]
+    switch mediaType {
+    case .image:
+        dict[CreativeKitLiteKeys.backgroundImage] = mediaData
+    case .video:
+        dict[CreativeKitLiteKeys.backgroundVideo] = mediaData
+    }
+   
+    // Optionally Add caption
+    if let caption = caption
+    {
+        dict[CreativeKitLiteKeys.caption] = caption
+    }
+    
+    // Optionally Add sticker
+    if let sticker = sticker
+    {
+       dict = addSticker(dict: dict, sticker: sticker)
+    }
+    
+    createAndOpenShareUrl(clientID:clientID, shareDest: ShareDestination.preview, dict:dict)
+}
+
+func shareToCamera(clientID: String, caption: String?, sticker: StickerData?)
+{
+    // Pass media content to the pasteboard
+    var dict: [String: Any] = [ CreativeKitLiteKeys.clientID: clientID ]
+    
+    // Optionally Add caption
+    if let caption = caption
+    {
+        dict[CreativeKitLiteKeys.caption] = caption
+    }
+    
+    // Optionally Add sticker
+    if let sticker = sticker
+    {
+       dict = addSticker(dict: dict, sticker: sticker)
+    }
+    
+    createAndOpenShareUrl(clientID:clientID, shareDest: ShareDestination.camera, dict:dict)
+    
+}
+
+func createAndOpenShareUrl(clientID:String, shareDest: ShareDestination, dict:[String:Any])
+{
+    // Verify if Snapchat can be opened
+    guard var urlComponents = URLComponents(string: shareDest.rawValue),
+        let url = urlComponents.url,
+        UIApplication.shared.canOpenURL(url) else {
+        return
+    }
+    
+    let items = [ dict ]
+    
+    // Set content in the Pasteboard to expire in 5 minutes.
+    // Content will be clared as soon as the Snapchat app receives it.
+    let expire = Date().addingTimeInterval(5*60)
+    let options = [ UIPasteboard.OptionsKey.expirationDate: expire ]
+    UIPasteboard.general.setItems(items, options: options)
+    
+    // Ensure that the pasteboard isn't tampered, we pass the change
+    // count to ensure the integrity of the pasteboard content
+    let queryItem = URLQueryItem.init(name: "checkcount",
+                                      value: String(format: "%ld",
+                                      UIPasteboard.general.changeCount))
+    
+    // Pass Client ID to the share URL
+    let clientIdQueryItem = URLQueryItem.init(name: "clientId", value: clientID)
+    
+    // Pass App Display name to the share URL
+    var appDisplayName = Bundle.main.infoDictionary!["CFBundleDisplayName"] as? String
+    if (appDisplayName == nil) {
+        appDisplayName = Bundle.main.infoDictionary?[kCFBundleNameKey as String] as? String
+    }
+    let appDisplayNameQueryItem = URLQueryItem.init(name: "appDisplayName", value: appDisplayName)
+ 
+    
+    // Create and Open the final Share URL
+    urlComponents.queryItems = [
+        queryItem,
+        clientIdQueryItem,
+        appDisplayNameQueryItem
+    ]
+    if let finalURL = urlComponents.url {
+        UIApplication.shared.open(finalURL, options: [:],
+                                  completionHandler: nil)
+    }
 }
 
 func shareOnSnapchat(clientID: String,
-                     shareMedia: ShareMedia,
+                     shareMedia: ShareMediaType,
                      shareDest: ShareDestination,
                      mediaData: Data,
                      caption: String?,

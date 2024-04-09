@@ -18,6 +18,7 @@ import java.io.*
 const val RESULT_INTENT_EXTRA = "RESULT_INTENT"
 const val CREATIVE_KIT_LITE_REQUEST_CODE = 9834 // 3P app can decide your own request code
 const val CLIENT_ID = "01a6f1e4-5b9c-46fa-a9ca-f7fc9f09f112"
+const val LENS_ID = "b400bacdc15d482db8da9d6655c58658"
 const val SNAPCHAT_PACKAGE = "com.snapchat.android"
 
 const val TAG = "CreativeKitLiteDemo"
@@ -120,7 +121,7 @@ class MainActivity : AppCompatActivity() {
         }
         val intent = CKLite.shareToDynamicLens(
             applicationContext,
-            "b400bacdc15d482db8da9d6655c58658",
+            LENS_ID,
             CLIENT_ID,
             launchData
         )
