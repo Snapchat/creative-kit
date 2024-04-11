@@ -273,3 +273,6 @@ fun shareToDynamicLens(
     return intent
 }
 ```
+
+## LICENSE
+License for this software is provided according to the [LICENSE](./LICENSE) file in this repository.
