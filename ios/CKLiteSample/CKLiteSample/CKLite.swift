@@ -5,7 +5,6 @@ enum CreativeKitLiteKeys {
     static let clientID = "com.snapchat.creativekit.clientID"
     static let backgroundImage = "com.snapchat.creativekit.backgroundImage"
     static let backgroundVideo = "com.snapchat.creativekit.backgroundVideo"
-    static let attachmentURL = "com.snapchat.creativekit.attachmentURL"
     static let stickerImage = "com.snapchat.creativekit.stickerImage"
     static let payloadMetadata = "com.snapchat.creativekit.payloadMetadata"
     static let lensUUID = "com.snapchat.creativekit.lensUUID"
@@ -196,80 +195,6 @@ func createAndOpenShareUrl(clientID:String, shareDest: ShareDestination, dict:[S
  
     
     // Create and Open the final Share URL
-    urlComponents.queryItems = [
-        queryItem,
-        clientIdQueryItem,
-        appDisplayNameQueryItem
-    ]
-    if let finalURL = urlComponents.url {
-        UIApplication.shared.open(finalURL, options: [:],
-                                  completionHandler: nil)
-    }
-}
-
-func shareOnSnapchat(clientID: String,
-                     shareMedia: ShareMediaType,
-                     shareDest: ShareDestination,
-                     mediaData: Data,
-                     caption: String?,
-                     attachmentURL: String?) {
-    // Verify if Snapchat can be opened
-    guard var urlComponents = URLComponents(string: shareDest.rawValue),
-        let url = urlComponents.url,
-        UIApplication.shared.canOpenURL(url) else {
-        return
-    }
-    
-    // Pass the content to the pasteboard
-    var dict: [String: Any] = [ CreativeKitLiteKeys.clientID: clientID ]
-    switch shareMedia {
-    case .image:
-        dict[CreativeKitLiteKeys.backgroundImage] = mediaData
-    case .video:
-        dict[CreativeKitLiteKeys.backgroundVideo] = mediaData
-    }
-    
-    if attachmentURL != nil && !(attachmentURL!.isEmpty) {
-        dict[CreativeKitLiteKeys.attachmentURL] = attachmentURL
-//        dict[CreativeKitLiteKeys.appName] = "My App Name"
-    }
-    
-    if caption != nil && !(caption!.isEmpty){
-        dict[CreativeKitLiteKeys.caption] = caption
-    }
-    
-    if shareDest == ShareDestination.camera {
-        let stickerData = mediaData
-        dict[CreativeKitLiteKeys.stickerImage] = stickerData
-        
-        var stickerMetadata = [String:Any]()
-        stickerMetadata[CreativeKitStickerMetadataKeys.posX] = 0.5
-        stickerMetadata[CreativeKitStickerMetadataKeys.posY] = 0.5
-        var payloadMetadata = [String:Any]()
-        payloadMetadata[CreativeKitStickerMetadataKeys.stickerMetadata] = stickerMetadata
-        dict[CreativeKitLiteKeys.payloadMetadata] = payloadMetadata
-    }
-    
-    let items = [ dict ]
-    
-    // The content in the Pasteboard to expire in 5 minutes
-    let expire = Date().addingTimeInterval(5*60)
-    let options = [ UIPasteboard.OptionsKey.expirationDate: expire ]
-    UIPasteboard.general.setItems(items, options: options)
-    
-    // Ensure that the pasteboard isn't tampered, we pass the change
-    // count to ensure the integrity of the pasteboard content
-    let queryItem = URLQueryItem.init(name: "checkcount",
-                                      value: String(format: "%ld",
-                                      UIPasteboard.general.changeCount))
-    let clientIdQueryItem = URLQueryItem.init(name: "clientId", value: clientID)
-    var appDisplayName = Bundle.main.infoDictionary!["CFBundleDisplayName"] as? String
-    if (appDisplayName == nil) {
-        appDisplayName = Bundle.main.infoDictionary?[kCFBundleNameKey as String] as? String
-    }
-    
-    let appDisplayNameQueryItem = URLQueryItem.init(name: "appDisplayName", value: appDisplayName)
- 
     urlComponents.queryItems = [
         queryItem,
         clientIdQueryItem,

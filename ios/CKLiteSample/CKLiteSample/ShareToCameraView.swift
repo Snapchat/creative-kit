@@ -12,7 +12,6 @@ struct ShareToCameraView: View {
     @State private var selectedImage: UIImage?
     @State private var showImagePicker = false
     @State private var caption  = "Hello!"
-    @State private var attachmentUrl = "http://kit.snap.com"
     
     var body: some View {
         ScrollView{
@@ -41,10 +40,6 @@ struct ShareToCameraView: View {
                 }
                 Text("2. (Optional) Set a caption")
                 TextField("Caption", text: $caption)
-                    .textFieldStyle(.roundedBorder)
-                    .ignoresSafeArea(.keyboard, edges: .bottom)
-                Text("3. (Optional) Set an attachment URL")
-                TextField("http://kit.snap.com", text: $attachmentUrl)
                     .textFieldStyle(.roundedBorder)
                     .ignoresSafeArea(.keyboard, edges: .bottom)
                 Spacer()
