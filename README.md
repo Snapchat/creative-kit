@@ -12,13 +12,48 @@ After the content is shared into Snapchat, users can apply any of Snapchat's cre
 With Creative Kit Lite you can add these features to your app, without having to download an SDK or increasing your app's binary size. Simply follow the code recommendations below. You can also check out the sample apps for iOS and Android in this repository for ready-to-deploy code samples. 
 
 ### Features
-Creative Kit has three main features: Dynamic Lenses, Stickers, and Full Screen sharing.
+Creative Kit Lite supports three different user flows for sharing in to Snapchat:
+- **Share to Camera**: Enable your users to share to Snapchat using the Snapchat Camera with a sticker overlay. After the user creates the Snap with the Snapchat Camera, the sticker overlay will appear and the user can add more creative tools (including filters, stickers and captions). Any background media
+passed in this flow will be ignored.
 
-Dynamic Lenses: Provide your users a way to share data from your app in Augmented Reality.
+- **Share to Preview**: Enable your users to share to Snapchat while bypassing the Snapchat Camera and with fullscreen
+content dictated by your app (sticker and caption text are still an option). The user will be able to add more
+creative tools to their Snap (including filters, stickers and captions).
 
-Stickers: Allow your users to share to the Snapchat camera, and decorate their Snaps with branded stickers from your app.
+- **Share to Lens**: Lenses provide the most flexibility for your share experience on Snapchat. Create the Lens in [Lens
+Studio](https://ar.snap.com/lens-studio-dl) , point to the Lens with Creative Kit and pass through the Lens launch data parameters to personalize the experience for the sender. 
 
-Full Screen sharing: Share images and videos to the preview screen to be shared as full screen stories or sent as direct snaps to their friends.
+### Snap Developer Portal
+Sharing of the content on Snapchat requires your app to be registered at [https://kit.snapchat.com/](https://kit.snapchat.com/) and prior approval from Snapchat. For more information on how to set up your app please see our [documentation](https://docs.snap.com/snap-kit/developer-portal/developing-your-app). You will need the Client ID obtained from the developer portal in order to use the features described below. 
+
+### Share to Camera User Flow
+The following diagram depicts the Share to Camera flow:
+
+<img src="./images/share-sheet.png" />
+<img src="./images/share-to-camera.png" />
+
+1. A user of your app taps a button to initiate the share and deep link to Snapchat.
+2. Before the user is redirected to Snapchat, your app creates a sticker, a small asset that will be passed to Snapchat and be placed on top of the a Snap to be captured on Snapchat.
+3. Redirect to Snapchat with using a custom URL scheme.
+4. Snapchat is launched and the shared sticker is loaded onto the Camera screen from the Pasteboard. The user can take a
+Snap with the Snapchat Camera (including AR Lenses), photo or video.
+5. The user gets to edit the photo taken by the camera and the passed sticker on Snapchat Preview editor. Other customized attributes (such as captions) will show up in this step.
+6. Once the user is done editing the Snap in Preview, the user can send the Snap to their friends, Stories and Groups.
+
+### Share to Preview User Flow
+
+The following diagram depicts the Share to Preview flow:
+
+<img src="./images/share-sheet.png" />
+<img src="./images/share-to-preview.png" />
+
+1. A user of your app taps a button to initiate the share and deep link to Snapchat.
+2. Before the user is redirect to Snapchat, your app creates a media content that covers the entire background screen. 
+3. Redirect to Snapchat with using a custom URL scheme.
+4. (The Snapchat Camera is bypassed in this flow)
+5. Snapchat is launched and the shared content is loaded onto the Preview screen from the Pasteboard. The user gets to edit
+the Content on Snapchat Preview editor. Other customized attributes (such as captions) will show up in this step. Note: We recommend that all background content passed through has a 9:16 ratio or else there will be issues with the editable canvas.
+6. Once the user is done editing the Snap in Preview, the user can send the Snap to his/her friends, Stories and Groups.
 
 ## Sharing From iOS
 Sharing from iOS makes use of the `UIPasteboard` to set data to specific keys that will be read by Snapchat. The method below takes the configured params and creates the final deeplink URL that will be opened by Snapchat. In the sections below we will explore how to configure the `items:[String:Any]` dictionary to send specific sharing information to Snapchat:
