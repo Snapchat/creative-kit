@@ -121,7 +121,7 @@ func shareToPreview(clientID: String, imageData: Data, caption: String?)
         dict["com.snapchat.creativekit.captionText"] = caption
     }
 
-    createAndOpenShareUrl(clientID:clientID, shareDest: "preview", dict:dict)
+    createAndOpenShareUrl(clientID:clientID, shareDest: "snapchat://creativekit/preview/1", dict:dict)
 }
 ```
 
@@ -157,7 +157,7 @@ func shareToCamera(clientID: String, sticker: Data, caption: String?)
         dict["com.snapchat.creativekit.captionText"] = caption
     }
     
-    createAndOpenShareUrl(clientID:clientID, shareDest: "camera", dict:dict)
+    createAndOpenShareUrl(clientID:clientID, shareDest: "snapchat://creativekit/camera/1", dict:dict)
 }
 ```
 
